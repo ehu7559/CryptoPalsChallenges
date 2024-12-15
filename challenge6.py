@@ -1,5 +1,4 @@
 from base64 import b64decode
-from time import sleep
 from challenge3 import SingleByteXOR
 from challenge5 import repeating_key_XOR
 
