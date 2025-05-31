@@ -89,15 +89,26 @@ class AES_primitives:
         data.extend(bytearray([(pad_len) for i in range(pad_len)]))
         return bytes(data)
 
-    def trim_padding(block: bytes) -> bytes:
-        if len(block) == 0: raise Exception("Trying to trim an empty AES ciphertext!")
-        if len(block) & 0xF: raise Exception(f"Expected AES ciphertext with length multiple of 16\nGot ciphertext with length {len(block)} instead!")
-        padding_length = block[-1]
-        if padding_length == 0 or padding_length > 16: raise Exception(f"Expected Padding Length in interval [1,16], found {padding_length} instead!")
-        for _ in range(padding_length):
-            if block[-1] != padding_length: raise Exception("Padding Not Compliant with PKCS#7")
-            block = block[:-1]
-        return bytes(block)
+    def validate_PKCS7_Padding(buf : bytes) -> bool:
+        #Check length is compliant.
+        #Must be non-zero multiple of 16 as padding is at least one byte.
+        if len(buf) % 16 or len(buf) == 0: return False
+
+        #Get the pad length, check validity
+        pad_implied_size = buf[-1]
+        if pad_implied_size > 16: return False
+
+        #Check the rest of the pad's implied length.
+        for i in range(-1, -1-pad_implied_size, -1):
+            if buf[i] != pad_implied_size: return False
+        
+        #No other fails, passes verification.
+        return True
+
+    def trim_pkcs7_padding(buf : bytes) -> bool:
+        assert(AES_primitives.validate_PKCS7_Padding(buf))
+        pad_implied_size = buf[-1]
+        return bytes(buf[:0-pad_implied_size])
 
     #Round Key Extension Function
     def run_key_schedule(keybytes: bytes) -> list[bytes]:
@@ -183,7 +194,7 @@ class AES_ECB_128:
             new_block = AES_primitives.ARK(new_block, round_keys[10])
             for i in range(9,0,-1): new_block = AES_primitives.decrypt_round(new_block, round_keys[i]) 
             new_block = AES_primitives.decrypt_final_round(new_block, round_keys[0])
-            if len(data) == 0: new_block = AES_primitives.trim_padding(new_block)
+            if len(data) == 0: new_block = AES_primitives.trim_pkcs7_padding(new_block)
             output.extend(new_block)
         return bytes(output)
 

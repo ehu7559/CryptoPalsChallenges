@@ -22,7 +22,7 @@ class AES_CBC_128:
 
     #Main Decryption Functions
     def decrypt(data: bytes, aes_key: bytes, iv: bytes) -> bytes:
-        output = bytes
+        output = bytes()
         round_keys = AES_primitives.get_round_keys(aes_key)
         while len(data) > 0:
             #Decrypt
@@ -36,7 +36,7 @@ class AES_CBC_128:
             #Consume
             iv, data = data[:16], data[16:]
             #Trim
-            if len(data) == 0: plain_block = AES_primitives.trim_padding(plain_block)
+            if len(data) == 0: plain_block = AES_primitives.trim_pkcs7_padding(plain_block)
             output += (plain_block)
         return bytes(output)
 

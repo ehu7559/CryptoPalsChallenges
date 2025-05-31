@@ -1,6 +1,6 @@
 from base64 import b64decode
 from random import randint
-from challenge7 import AES_ECB_128 as ECB, AES_primitives
+from challenge7 import AES_ECB_128 as ECB
 from challenge8 import probablyECB
 
 #Encryption generator. Key is generated in this scope and never 
