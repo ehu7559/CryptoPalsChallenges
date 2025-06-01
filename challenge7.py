@@ -96,7 +96,8 @@ class AES_primitives:
 
         #Get the pad length, check validity
         pad_implied_size = buf[-1]
-        if pad_implied_size > 16: return False
+        if pad_implied_size > 16 or pad_implied_size == 0: return False
+
 
         #Check the rest of the pad's implied length.
         for i in range(-1, -1-pad_implied_size, -1):

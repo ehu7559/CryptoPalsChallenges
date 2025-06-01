@@ -44,8 +44,8 @@ def deal_data(buf : bytes, streams : int) -> list[bytes]:
     return [bytes(x) for x in output]
 
 #Attack function (This is loosely based on what I remember of the Vigenere cipher attack I implemented in college)
-def bitwiseVigenereCrack(buf: bytes, cap = 0) -> bytes:
-    keylen = kasiski_wrap(buf, cap)
+def bitwiseVigenereCrack(buf: bytes, cap = 0, keysize = None) -> bytes:
+    keylen = keysize if keysize else kasiski_wrap(buf, cap)
     keybuf = bytearray(keylen)
     streams = deal_data(buf, keylen)
     #print([hash(x) for x in streams])
